@@ -27,6 +27,29 @@
 			wakeLock = null;
 		}
 	}
+
+	async function apiRequest(key: string) {
+		const res = await fetch(`/api/${key}`, { method: 'POST' });
+		if (!res.ok) {
+			const json = await res.json();
+			alert(JSON.stringify(json));
+			throw new Error('Network response was not ok.');
+		}
+	}
+
+	async function changeVolume(e: Event) {
+		const volumeStr = (e.target as HTMLInputElement).value;
+		const volume = parseFloat(volumeStr);
+		const res = await fetch(`/api/media/volume`, {
+			method: 'POST',
+			body: JSON.stringify({ volume })
+		});
+		if (!res.ok) {
+			const json = await res.json();
+			alert(JSON.stringify(json));
+			throw new Error('Network response was not ok.');
+		}
+	}
 </script>
 
 <main class="section">
@@ -38,10 +61,21 @@
 			Wake Lock Status: {wakeLockStatus ? '😎 enabled' : '😪 disabled'}
 		</div>
 		<div class="buttons has-addons is-centered">
-			<button class="button is-large"> ⏮️ </button>
-			<button class="button is-large"> ⏯️ </button>
-			<button class="button is-large"> ⏭️ </button>
+			<button class="button is-large" on:click={() => apiRequest('media/prev-track')}> ⏮️ </button>
+			<button class="button is-large" on:click={() => apiRequest('media/play-pause')}> ⏯️ </button>
+			<button class="button is-large" on:click={() => apiRequest('media/next-track')}> ⏭️ </button>
+			<button class="button is-large" on:click={() => apiRequest('media/mute')}> 🔇 </button>
 		</div>
+		<input
+			class="slider is-fullwidth is-circle"
+			step="0.005"
+			min="0"
+			max="1"
+			value="0.1"
+			type="range"
+			on:input={changeVolume}
+		/>
+		
 	</div>
 </main>
 
