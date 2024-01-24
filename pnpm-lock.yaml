@@ -40,6 +40,9 @@ devDependencies:
   '@vite-pwa/sveltekit':
     specifier: ^0.3.0
     version: 0.3.0(@sveltejs/kit@2.4.1)(vite-plugin-pwa@0.17.4)
+  concurrency:
+    specifier: ^0.1.4
+    version: 0.1.4
   eslint:
     specifier: ^8.56.0
     version: 8.56.0
@@ -2488,6 +2491,10 @@ packages:
 
   /concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    dev: true
+
+  /concurrency@0.1.4:
+    resolution: {integrity: sha512-uwS/Z8zsvOUnIfTiMM5kV5N5JnsrR1fpt5thlg723jELkoORXmFs+BJHOaCn9OTGpCVkfG3vqiLGBPHiBXxKaA==}
     dev: true
 
   /console-control-strings@1.1.0:

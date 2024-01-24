@@ -1,7 +1,7 @@
 <script lang="ts">
 	// 起動ロックの参照を作成
 	let wakeLock: WakeLockSentinel | null = null;
-	$: wakeLockStatus = wakeLock && !wakeLock.released;
+	let wakeLockStatus = false;
 
 	//---------------------------------------------
 	// screen wake lock をリクエストするための関数
@@ -13,6 +13,10 @@
 			try {
 				// screen wake lock をリクエストする
 				wakeLock = await navigator.wakeLock.request('screen');
+				wakeLockStatus = true;
+				wakeLock.addEventListener('release', () => {
+					wakeLockStatus = false;
+				});
 			} catch (err) {
 				if (err instanceof Error) {
 					console.error(`${err.name}, ${err.message}`);
@@ -20,9 +24,6 @@
 				}
 			}
 		} else {
-			// wakeLock が null であれば、
-			// wakeLock が既にリクエストされているので、
-			// wakeLock を解除する
 			wakeLock?.release();
 			wakeLock = null;
 		}
@@ -52,14 +53,18 @@
 	}
 </script>
 
-<main class="section">
-	<div class="container">
+<main class="container">
+	<section class="section">
+		<h1 class="title">Wake Lock Section</h1>
 		<button class="box button is-light is-fullwidth" on:click={toggleWakeLock}>
 			Toggle Wake Lock
 		</button>
 		<div class="box">
 			Wake Lock Status: {wakeLockStatus ? '😎 enabled' : '😪 disabled'}
 		</div>
+	</section>
+	<section class="section">
+		<h1 class="title">Media Section</h1>
 		<div class="buttons has-addons is-centered">
 			<button class="button is-large" on:click={() => apiRequest('media/prev-track')}> ⏮️ </button>
 			<button class="button is-large" on:click={() => apiRequest('media/play-pause')}> ⏯️ </button>
@@ -75,8 +80,11 @@
 			type="range"
 			on:input={changeVolume}
 		/>
+	</section>
+	<section class="section">
+		<h1 class="title">Desktop Section</h1>
 		
-	</div>
+	</section>
 </main>
 
 <style lang="scss">
