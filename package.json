@@ -3,8 +3,9 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev:vite": "vite dev",
-		"dev:osc": "ts-node ./src/server/osc.ts",
+		"dev": "concurrently \"npm run dev:vite\" \"npm run dev:osc\"",
+		"dev:vite": "vite",
+		"dev:osc": "node --no-warnings=ExperimentalWarning --loader ts-node/esm ./src/server/osc.ts",
 		"build": "vite build",
 		"preview": "vite preview",
 		"test": "npm run test:integration && npm run test:unit",
@@ -22,10 +23,11 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "8.56.0",
 		"@types/node-osc": "^6.0.3",
+		"@types/ws": "^8.5.10",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"@vite-pwa/sveltekit": "^0.3.0",
-		"concurrency": "^0.1.4",
+		"concurrently": "^8.2.2",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.35.1",
@@ -34,6 +36,7 @@
 		"sass": "^1.70.0",
 		"svelte": "^4.2.7",
 		"svelte-check": "^3.6.0",
+		"ts-node": "^10.9.2",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"vite": "^5.0.3",
@@ -42,6 +45,7 @@
 	"type": "module",
 	"dependencies": {
 		"node-osc": "^9.1.0",
-		"robotjs": "^0.6.0"
+		"robotjs": "^0.6.0",
+		"ws": "^8.16.0"
 	}
 }

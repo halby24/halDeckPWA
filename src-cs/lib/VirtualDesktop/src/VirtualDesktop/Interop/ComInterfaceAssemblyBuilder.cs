@@ -94,7 +94,15 @@ internal class ComInterfaceAssemblyBuilder
             .Where(x => string.IsNullOrEmpty(x) == false)
             .Cast<string>()
             .ToArray();
+        foreach (var item in interfaceNames)
+        {
+            Console.WriteLine(item);
+        }
         var iids = IID.GetIIDs(interfaceNames);
+        foreach (var item in iids)
+        {
+            Console.WriteLine(item.Key + " " + item.Value);
+        }
 
         // e.g.
         //   IVirtualDesktop

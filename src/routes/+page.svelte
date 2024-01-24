@@ -1,7 +1,23 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+
 	// 起動ロックの参照を作成
 	let wakeLock: WakeLockSentinel | null = null;
 	let wakeLockStatus = false;
+	let volume = 0.1;
+
+	onMount(() => {
+		const volumeSocket = new WebSocket('wss://halby-desktop.local:24001');
+		volumeSocket.addEventListener('message', (event) => {
+			const data = JSON.parse(event.data);
+			if (data.msg && data.msg === '/1/mastervolume') {
+				const receivedVol = data.arg;
+				if (!receivedVol) return;
+				if (typeof receivedVol !== 'number') return;
+				volume = receivedVol;
+			}
+		});
+	});
 
 	//---------------------------------------------
 	// screen wake lock をリクエストするための関数
@@ -76,14 +92,14 @@
 			step="0.005"
 			min="0"
 			max="1"
-			value="0.1"
+			value={volume}
 			type="range"
 			on:input={changeVolume}
 		/>
 	</section>
 	<section class="section">
 		<h1 class="title">Desktop Section</h1>
-		
+
 	</section>
 </main>
 
