@@ -4,8 +4,8 @@ import { WebSocketServer } from "ws";
 import { Server } from "node-osc";
 
 const options = {
-    key: fs.readFileSync("./certs/halby-desktop.local-key.pem"),
-    cert: fs.readFileSync("./certs/halby-desktop.local.pem"),
+    key: fs.readFileSync(process.env.KEY_PATH as string),
+    cert: fs.readFileSync(process.env.CERT_PATH as string),
 };
 
 const httpsServer = https.createServer(options, (req, res) =>
@@ -14,9 +14,10 @@ const httpsServer = https.createServer(options, (req, res) =>
     res.end('hello world\n')
 });
 
-const oscServer = new Server(9001, '0.0.0.0', () =>
+const oscServerPort = Number(process.env.OSC_SERVER_PORT);
+const oscServer = new Server(oscServerPort, '0.0.0.0', () =>
 {
-    console.log('OSC Server is listening on port 9001');
+    console.log(`OSC Server is listening on port ${oscServerPort}`);
 });
 
 const wss = new WebSocketServer({ server: httpsServer });
@@ -47,4 +48,4 @@ wss.on('close', () =>
     console.log('WebSocket connection closed');
 });
 
-httpsServer.listen(24001);
+httpsServer.listen(process.env.PUBLIC_WSS_PORT as string);

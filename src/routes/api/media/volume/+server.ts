@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { Client } from 'node-osc';
+import { OS, OSC_CLIENT_PORT } from '$env/static/private';
 
 export const POST: RequestHandler = async ({ request }) =>
 {
@@ -24,7 +25,7 @@ export const POST: RequestHandler = async ({ request }) =>
         throw error(422, 'volume value is not between 0 and 1');
     }
 
-    const client = new Client('localhost', 7001);
+    const client = new Client('localhost', Number(OSC_CLIENT_PORT));
     await new Promise<void>((resolve, reject) => client.send('/1/mastervolume', volume, err => err ? reject(err) : resolve()))
         .catch(err => { throw error(500, err); });
     client.close();

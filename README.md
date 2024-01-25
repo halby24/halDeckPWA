@@ -1,7 +1,10 @@
 # halDeskPWA
 
-## Requirements
+## 概要
 
-- .NET 6 SDK
+ジェネリックオレオレStreamDeck
+
+## 依存ライブラリなど
+
 - Node.js 20
 - 

@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "concurrently \"npm run dev:vite\" \"npm run dev:osc\"",
+		"dev": "concurrently \"npm run dev:vite\" \"dotenv -- npm run dev:osc\"",
 		"dev:vite": "vite",
 		"dev:osc": "node --no-warnings=ExperimentalWarning --loader ts-node/esm ./src/server/osc.ts",
 		"build": "vite build",
@@ -28,6 +28,7 @@
 		"@typescript-eslint/parser": "^6.0.0",
 		"@vite-pwa/sveltekit": "^0.3.0",
 		"concurrently": "^8.2.2",
+		"dotenv-cli": "^7.3.0",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.35.1",

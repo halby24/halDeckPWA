@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { PUBLIC_DOMAIN, PUBLIC_WSS_PORT } from '$env/static/public';
 
 	// 起動ロックの参照を作成
 	let wakeLock: WakeLockSentinel | null = null;
@@ -61,7 +62,7 @@
 	}
 
 	async function initVolumeWebSocket() {
-		const volumeSocket = new WebSocket('wss://halby-desktop.local:24001');
+		const volumeSocket = new WebSocket(`wss://${PUBLIC_DOMAIN}:${PUBLIC_WSS_PORT}`);
 		volumeSocket.addEventListener('message', (event) => {
 			const data = JSON.parse(event.data);
 			if (data.msg && data.msg === '/1/mastervolume') {
