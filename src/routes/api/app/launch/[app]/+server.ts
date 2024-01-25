@@ -8,7 +8,7 @@ export const POST: RequestHandler = async ({ params }) =>
 {
     const { app } = params;
 
-    await exec(`${app}.exe`).catch(() => { error(500, `Failed to launch ${app}.exe`); });
+    await exec(`start ${app}.exe`).catch(() => { error(500, `Failed to launch ${app}.exe`); });
 
     return new Response();
 };
