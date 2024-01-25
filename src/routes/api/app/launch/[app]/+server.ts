@@ -1,8 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { exec as execCb } from 'child_process';
-// import { promisify } from 'util';
-// import activeWindow from 'active-win';
 import ffi from 'ffi-napi';
 import ref from 'ref-napi';
 
@@ -30,7 +28,7 @@ export const POST: RequestHandler = async ({ params }) =>
 
         for (const winHandleId of winHandleIds)
         {
-            const exeName = await getExecutableNameFromHandle(winHandleId);
+            const exeName = getExecutableNameFromHandle(winHandleId);
             console.log(exeName);
             if (exeName === app)
             {
@@ -44,53 +42,35 @@ export const POST: RequestHandler = async ({ params }) =>
     return new Response();
 };
 
-// Windows API関数の定義
-const user32 = ffi.Library('user32', {
-    'GetWindowThreadProcessId': ['uint32', ['pointer', 'pointer']],
-});
-
-const kernel32 = ffi.Library('kernel32', {
-    'OpenProcess': ['pointer', ['uint32', 'int', 'uint32']],
-    'QueryFullProcessImageNameA': ['int', ['pointer', 'uint32', 'pointer', 'pointer']],
-    'CloseHandle': ['int', ['pointer']],
-});
-
-// プロセスアクセス権
-const PROCESS_QUERY_INFORMATION: number = 0x0400;
-const PROCESS_VM_READ: number = 0x0010;
-
-// 実行ファイル名を取得する関数
-function getExecutableNameFromHandle(windowHandle: number): Promise<string>
+function getExecutableNameFromHandle(handle: number): string | null
 {
-    return new Promise((resolve, reject) =>
-    {
-        const hwnd = ref.alloc('pointer', ref.NULL);
-        hwnd.writeInt32LE(windowHandle, 0);
-
-        const pid = ref.alloc('uint32');
-        user32.GetWindowThreadProcessId(hwnd, pid);
-
-        const processHandle = kernel32.OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, pid.deref());
-
-        if (!processHandle.isNull())
-        {
-            const bufferSize: number = 1024;
-            const buffer: Buffer = Buffer.alloc(bufferSize);
-            const bufferSizeRef = ref.alloc('uint32', bufferSize);
-
-            if (kernel32.QueryFullProcessImageNameA(processHandle, 0, buffer, bufferSizeRef))
-            {
-                const exeName: string = buffer.toString('utf-8').replace(/\0+$/, '');
-                kernel32.CloseHandle(processHandle);
-                resolve(exeName);
-            } else
-            {
-                kernel32.CloseHandle(processHandle);
-                reject(new Error('Failed to retrieve process name.'));
-            }
-        } else
-        {
-            reject(new Error('Failed to open process.'));
-        }
+    // 関数のシグネチャを定義
+    const lib = ffi.Library('lib\\get_exe_path.dll', {
+        'get_exe_path': ['int', ['uint64', 'pointer']],
+        'free_path': ['void', ['pointer']],
     });
+
+    // HWND（または任意のuintptr_t値）を表す値
+    const hwndValue = handle;
+    const hwndBuffer = ref.alloc(ref.types.uint64, hwndValue);
+    console.log(hwndValue);
+
+    // 文字列のポインタを準備（例えば、結果を受け取るためのポインタ）
+    const pathPtrPtr = ref.alloc('char **');
+
+    // 関数を呼び出す
+    if (!lib.get_exe_path(hwndBuffer.deref(), pathPtrPtr))
+    {
+        console.log('Failed to call get_exe_path');
+        return null;
+    }
+
+    // 結果の文字列を取得（ここでは、戻り値がポインタの場合を想定）
+    const path = ref.readCString(ref.readPointer(pathPtrPtr), 0);
+    console.log('Executable Path:', path);
+
+    // メモリの解放
+    lib.free_path(pathPtrPtr.readPointer());
+
+    return path;
 }

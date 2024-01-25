@@ -4,5 +4,6 @@
 
 extern "C"
 {
-    DLLEXPORT int get_exe_path(wchar_t** path);
+    DLLEXPORT int get_exe_path(const unsigned long long window_handle, char** path);
+    DLLEXPORT void free_path(char* path);
 }

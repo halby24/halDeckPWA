@@ -2,6 +2,7 @@
 #include "Windows.h"
 #include <iostream>
 #include <psapi.h>
+#include <stdlib.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -9,11 +10,14 @@
 #undef MAX_PATH
 #define MAX_PATH 1024
 
-int get_exe_path(uintptr_t windowHandle, wchar_t** path)
+char* wcharToChar(const wchar_t* wstr);
+
+int get_exe_path(const unsigned long long window_handle, char** path)
 {
     setlocale(LC_ALL, "ja_JP.UTF-8");
 
-    HWND hWnd = reinterpret_cast<HWND>(windowHandle);
+    HWND hWnd = reinterpret_cast<HWND>(window_handle);
+    std::cerr << "hWnd: " << hWnd << std::endl;
 
     DWORD id;
     GetWindowThreadProcessId(hWnd, &id);
@@ -48,17 +52,7 @@ int get_exe_path(uintptr_t windowHandle, wchar_t** path)
         if (wcsstr(modName, L".exe") == NULL) continue;
         foundFlag = true;
 
-        *path = new wchar_t[MAX_PATH];
-        switch (wcsncpy_s(*path, MAX_PATH, modName, _TRUNCATE))
-        {
-        case 0:
-            break;
-        case STRUNCATE: std::cerr << "Truncated." << std::endl;
-        default:
-            std::cerr << "Failed to copy." << std::endl;
-            delete *path;
-            return FALSE;
-        }
+        *path = wcharToChar(modName);
 
         break;
     }
@@ -71,4 +65,34 @@ int get_exe_path(uintptr_t windowHandle, wchar_t** path)
     CloseHandle(hProc);
 
     return TRUE;
+}
+
+void free_path(char* path)
+{
+    delete[] path;
+}
+
+char* wcharToChar(const wchar_t* wstr) {
+    if (wstr == nullptr) {
+        return nullptr; // 引数がnullptrの場合はnullptrを返す
+    }
+
+    // 変換後の文字列のサイズを取得するためにwcstombs_sを最初に呼び出す
+    size_t convertedSize = 0;
+    errno_t err = wcstombs_s(&convertedSize, nullptr, 0, wstr, _TRUNCATE);
+    if (err != 0 || convertedSize == 0) {
+        // サイズの取得に失敗
+        return nullptr;
+    }
+
+    // char配列に変換するためのメモリを動的に確保
+    char* converted = new char[convertedSize];
+    err = wcstombs_s(&convertedSize, converted, convertedSize, wstr, _TRUNCATE);
+    if (err != 0) {
+        // 変換に失敗した場合
+        delete[] converted; // 確保したメモリを解放
+        return nullptr;
+    }
+
+    return converted; // 変換された文字列へのポインタを返す
 }
