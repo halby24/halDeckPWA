@@ -3,6 +3,8 @@ import type { RequestHandler } from './$types';
 import { getVirtualDesktops } from '$lib/get-virtual-desktops';
 import robot from 'robotjs';
 
+const INTERVAL = 0.1;
+
 export const POST: RequestHandler = async ({ params }) =>
 {
     const { name } = params;
@@ -21,9 +23,9 @@ export const POST: RequestHandler = async ({ params }) =>
     const diffSign = Math.sign(diff);
     if (diffAbs === 0) return new Response();
     if (diffSign === 1)
-        await repeatTask(1, diffAbs, () => robot.keyTap('right', ['control', 'command']));
+        await repeatTask(INTERVAL, diffAbs, () => robot.keyTap('right', ['control', 'command']));
     else
-        await repeatTask(1, diffAbs, () => robot.keyTap('left', ['control', 'command']));
+        await repeatTask(INTERVAL, diffAbs, () => robot.keyTap('left', ['control', 'command']));
 
     return new Response();
 };
