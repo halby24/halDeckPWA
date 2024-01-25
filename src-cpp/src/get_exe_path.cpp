@@ -17,7 +17,6 @@ int get_exe_path(const unsigned long long window_handle, char** path)
     setlocale(LC_ALL, "ja_JP.UTF-8");
 
     HWND hWnd = reinterpret_cast<HWND>(window_handle);
-    std::cerr << "hWnd: " << hWnd << std::endl;
 
     DWORD id;
     GetWindowThreadProcessId(hWnd, &id);
