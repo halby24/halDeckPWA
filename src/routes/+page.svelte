@@ -105,10 +105,14 @@
 	<section class="section">
 		<h1 class="title">Desktop Section</h1>
 		<div class="buttons has-addons is-centered">
-			<button class="button is-large" on:click={() => apiRequest('desktop/Game')}> 🎮 </button>
-			<button class="button is-large" on:click={() => apiRequest('desktop/Graphics')}> 🎨 </button>
-			<button class="button is-large" on:click={() => apiRequest('desktop/Main')}> 💻 </button>
-			<button class="button is-large" on:click={() => apiRequest('desktop/Develop')}> 🛠️ </button>
+			<button class="button is-large" on:click={() => apiRequest('desktop/switch/Game')}> 🎮 </button>
+			<button class="button is-large" on:click={() => apiRequest('desktop/switch/Graphics')}> 🎨 </button>
+			<button class="button is-large" on:click={() => apiRequest('desktop/switch/Main')}> 💻 </button>
+			<button class="button is-large" on:click={() => apiRequest('desktop/switch/Develop')}> 🛠️ </button>
+		</div>
+		<div class="buttons is-centered">
+			<button class="button" on:click={() => apiRequest('desktop/pin-active')}> 📌 Pin Active </button>
+			<button class="button" on:click={() => apiRequest('desktop/unpin-active')}> ✂️ Unpin Active </button>
 		</div>
 	</section>
 </main>

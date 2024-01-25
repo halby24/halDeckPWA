@@ -44,6 +44,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"active-win": "^8.1.1",
+		"iconv-lite": "^0.6.3",
 		"node-osc": "^9.1.0",
 		"regedit": "^5.1.2",
 		"robotjs": "^0.6.0",
