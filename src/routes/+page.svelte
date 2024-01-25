@@ -7,16 +7,7 @@
 	let volume = 0.1;
 
 	onMount(() => {
-		const volumeSocket = new WebSocket('wss://halby-desktop.local:24001');
-		volumeSocket.addEventListener('message', (event) => {
-			const data = JSON.parse(event.data);
-			if (data.msg && data.msg === '/1/mastervolume') {
-				const receivedVol = data.arg;
-				if (!receivedVol) return;
-				if (typeof receivedVol !== 'number') return;
-				volume = receivedVol;
-			}
-		});
+		initVolumeWebSocket();
 	});
 
 	//---------------------------------------------
@@ -45,13 +36,14 @@
 		}
 	}
 
-	async function apiRequest(key: string) {
-		const res = await fetch(`/api/${key}`, { method: 'POST' });
+	async function apiRequest(key: string, method = 'POST'): Promise<any> {
+		const res = await fetch(`/api/${key}`, { method });
 		if (!res.ok) {
 			const json = await res.json();
 			alert(JSON.stringify(json));
 			throw new Error('Network response was not ok.');
 		}
+		return res.json();
 	}
 
 	async function changeVolume(e: Event) {
@@ -66,6 +58,19 @@
 			alert(JSON.stringify(json));
 			throw new Error('Network response was not ok.');
 		}
+	}
+
+	async function initVolumeWebSocket() {
+		const volumeSocket = new WebSocket('wss://halby-desktop.local:24001');
+		volumeSocket.addEventListener('message', (event) => {
+			const data = JSON.parse(event.data);
+			if (data.msg && data.msg === '/1/mastervolume') {
+				const receivedVol = data.arg;
+				if (!receivedVol) return;
+				if (typeof receivedVol !== 'number') return;
+				volume = receivedVol;
+			}
+		});
 	}
 </script>
 
@@ -99,7 +104,12 @@
 	</section>
 	<section class="section">
 		<h1 class="title">Desktop Section</h1>
-
+		<div class="buttons has-addons is-centered">
+			<button class="button is-large" on:click={() => apiRequest('desktop/Game')}> 🎮 </button>
+			<button class="button is-large" on:click={() => apiRequest('desktop/Graphics')}> 🎨 </button>
+			<button class="button is-large" on:click={() => apiRequest('desktop/Main')}> 💻 </button>
+			<button class="button is-large" on:click={() => apiRequest('desktop/Develop')}> 🛠️ </button>
+		</div>
 	</section>
 </main>
 
