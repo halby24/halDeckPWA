@@ -2,7 +2,6 @@ import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { exec as execCb } from 'child_process';
 import { promisify } from 'util';
-// import { getActiveWindowPid } from '$lib/get-active-window-pid';
 import activeWindow from 'active-win';
 
 const exec = promisify(execCb);
