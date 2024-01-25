@@ -120,9 +120,9 @@
 		<h1 class="title">App Section</h1>
 		<div class="buttons has-addons is-centered">
 			<button class="button is-large" on:click={() => apiRequest('app/launch/msedge')}> 🌐 </button>
-			<button class="button is-large" on:click={() => apiRequest('app/launch/Code')}> 📝 </button>
-			<button class="button is-large" on:click={() => apiRequest('app/launch/WindowsTerminal')}> 🪟 </button>
-			<button class="button is-large" on:click={() => apiRequest('app/launch/Discord')}> 💬 </button>
+			<button class="button is-large" on:click={() => apiRequest('app/open/Code')}> 📝 </button>
+			<button class="button is-large" on:click={() => apiRequest('app/open/WindowsTerminal')}> 🪟 </button>
+			<button class="button is-large" on:click={() => apiRequest('app/open/Discord')}> 💬 </button>
 	</section>
 </main>
 
