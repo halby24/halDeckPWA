@@ -1,7 +1,5 @@
 # halDeskPWA
 
-## 概要
-
 ジェネリックオレオレStreamDeck
 
 ## 依存ライブラリなど
@@ -11,8 +9,11 @@
 ## 環境構築
 
 1. プロジェクトをクローンする。
-2. プロジェクトルートでnpm install (pnpm i) する。
-3. mkcertなどでSSL証明書を作成して
+1. プロジェクトルートでnpm install (pnpm i) する。
+1. mkcertなどでSSL証明書を作成してcertsディレクトリに配置する。
+1. スマホにサーバー証明書を登録する。
+1. /.env.exampleと/src/deckconfig.toml.exampleをそれぞれ/.envと/src/deckconfig.tomlにコピーする。
+1. /.envと/src/deckconfig.tomlをいい感じに設定する。
 
 ## 使い方
 
@@ -22,6 +23,9 @@
 
 ## deckconfig.tomlについて
 
+- volume
+  - modeはほとんどの場合'system'でよい。
+  - 'totalmixfx'にするとRME TotalMix FXのボリュームを操作できる。この場合TotalMixFXでOSCを有効にし、ポート設定などをしておく必要がある。
 - desktop.switch
   - nameにSwitch対象の仮想デスクトップの名前を設定する
   - bodyはボタンの本文

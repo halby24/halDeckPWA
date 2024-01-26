@@ -1,3 +1,6 @@
+[volume]
+mode = 'system'
+
 [[desktop.switch]]
 name = 'Game'
 body = '🎮'

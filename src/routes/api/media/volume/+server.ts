@@ -18,6 +18,11 @@ export const POST: RequestHandler = async ({ request }) =>
     {
         throw error(422, 'volume value is not a number');
     }
+    if (!reqBody.mode)
+    {
+        throw error(400, 'no mode value');
+    }
+    const mode = reqBody.mode as string;
 
     const volume = reqBody.volume as number;
     if (volume < 0 || volume > 1)
@@ -25,10 +30,13 @@ export const POST: RequestHandler = async ({ request }) =>
         throw error(422, 'volume value is not between 0 and 1');
     }
 
-    const client = new Client('localhost', Number(OSC_CLIENT_PORT));
-    await new Promise<void>((resolve, reject) => client.send('/1/mastervolume', volume, err => err ? reject(err) : resolve()))
-        .catch(err => { throw error(500, err); });
-    client.close();
+    if (mode === 'totalmixfx')
+    {
+        const client = new Client('localhost', Number(OSC_CLIENT_PORT));
+        await new Promise<void>((resolve, reject) => client.send('/1/mastervolume', volume, err => err ? reject(err) : resolve()))
+            .catch(err => { throw error(500, err); });
+        client.close();
+    }
 
-    return new Response(JSON.stringify({ ok: true, message: 'success!' }),);
+    return new Response();
 };

@@ -2,14 +2,16 @@
 	import { onMount } from 'svelte';
 	import { PUBLIC_DOMAIN, PUBLIC_WSS_PORT } from '$env/static/public';
 	import deckconfig from '/src/deckconfig.toml';
+	import BgCanvas from '$lib/components/BgCanvas.svelte';
 
 	// 起動ロックの参照を作成
 	let wakeLock: WakeLockSentinel | null = null;
 	let wakeLockStatus = false;
 	let volume = 0.1;
+	const isTotalmixfx = deckconfig.volume.mode === 'totalmixfx';
 
 	onMount(() => {
-		initVolumeWebSocket();
+		if (isTotalmixfx) initVolumeWebSocket();
 		console.log(deckconfig);
 	});
 
@@ -54,7 +56,7 @@
 		const volume = parseFloat(volumeStr);
 		const res = await fetch(`/api/media/volume`, {
 			method: 'POST',
-			body: JSON.stringify({ volume })
+			body: JSON.stringify({ volume, mode: deckconfig.volume.mode })
 		});
 		if (!res.ok) {
 			const json = await res.json();
@@ -125,6 +127,7 @@
 			{/each}
 	</section>
 </main>
+<BgCanvas />
 
 <style lang="scss">
 	main {
