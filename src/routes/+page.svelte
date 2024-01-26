@@ -127,7 +127,7 @@
 			{/each}
 	</section>
 </main>
-<BgCanvas />
+<!-- <BgCanvas /> -->
 
 <style lang="scss">
 	main {
