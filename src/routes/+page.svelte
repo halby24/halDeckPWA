@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { PUBLIC_DOMAIN, PUBLIC_WSS_PORT } from '$env/static/public';
+	import deckconfig from '/src/deckconfig.toml';
 
 	// 起動ロックの参照を作成
 	let wakeLock: WakeLockSentinel | null = null;
@@ -9,6 +10,7 @@
 
 	onMount(() => {
 		initVolumeWebSocket();
+		console.log(deckconfig);
 	});
 
 	//---------------------------------------------
@@ -106,10 +108,9 @@
 	<section class="section">
 		<h1 class="title">Desktop Section</h1>
 		<div class="buttons has-addons is-centered">
-			<button class="button is-large" on:click={() => apiRequest('desktop/switch/Game')}> 🎮 </button>
-			<button class="button is-large" on:click={() => apiRequest('desktop/switch/Graphics')}> 🎨 </button>
-			<button class="button is-large" on:click={() => apiRequest('desktop/switch/Main')}> 💻 </button>
-			<button class="button is-large" on:click={() => apiRequest('desktop/switch/Develop')}> 🛠️ </button>
+			{#each deckconfig.desktop.switch as target }
+				<button class="button is-large" on:click={() => apiRequest(`desktop/switch/${target.name}`)}> {target.body} </button>
+			{/each}
 		</div>
 		<div class="buttons is-centered">
 			<button class="button" on:click={() => apiRequest('desktop/pin-active')}> 📌 Pin Active </button>
@@ -119,10 +120,9 @@
 	<section class="section">
 		<h1 class="title">App Section</h1>
 		<div class="buttons has-addons is-centered">
-			<button class="button is-large" on:click={() => apiRequest('app/launch/msedge')}> 🌐 </button>
-			<button class="button is-large" on:click={() => apiRequest('app/open/Code')}> 📝 </button>
-			<button class="button is-large" on:click={() => apiRequest('app/open/WindowsTerminal')}> 🪟 </button>
-			<button class="button is-large" on:click={() => apiRequest('app/open/Discord')}> 💬 </button>
+			{#each deckconfig.app as target }
+				<button class="button is-large" on:click={() => apiRequest(`app/${target.mode}/${target.name}`)}> {target.body} </button>
+			{/each}
 	</section>
 </main>
 

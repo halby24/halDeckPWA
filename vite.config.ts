@@ -3,6 +3,7 @@ import { loadEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 import type { SvelteKitPWAOptions } from '@vite-pwa/sveltekit';
+import { ViteToml } from 'vite-plugin-toml';
 
 const pwaOptions: Partial<SvelteKitPWAOptions> = {
 	manifest: {
@@ -24,6 +25,7 @@ export default defineConfig(({ command, mode }) =>
 		plugins: [
 			sveltekit(),
 			SvelteKitPWA(pwaOptions),
+			ViteToml()
 		],
 		test: {
 			include: ['src/**/*.{test,spec}.{js,ts}']
