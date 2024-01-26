@@ -1,0 +1,35 @@
+[[desktop.switch]]
+name = 'Game'
+body = '🎮'
+
+[[desktop.switch]]
+name = 'Graphics'
+body = '🎨'
+
+[[desktop.switch]]
+name = 'Main'
+body = '💻'
+
+[[desktop.switch]]
+name = 'Develop'
+body = '🛠️'
+
+[[app]]
+name = 'msedge'
+body = '🌐'
+mode = 'launch'
+
+[[app]]
+name = 'Code'
+body = '📝'
+mode = 'open'
+
+[[app]]
+name = 'WindowsTerminal'
+body = '🪟'
+mode = 'open'
+
+[[app]]
+name = 'Discord'
+body = '💬'
+mode = 'open'
