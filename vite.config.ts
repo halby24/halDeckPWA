@@ -25,7 +25,7 @@ export default defineConfig(({ command, mode }) =>
 		plugins: [
 			sveltekit(),
 			SvelteKitPWA(pwaOptions),
-			ViteToml()
+			ViteToml(),
 		],
 		test: {
 			include: ['src/**/*.{test,spec}.{js,ts}']

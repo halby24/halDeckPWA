@@ -2,32 +2,36 @@
 	import { onMount } from 'svelte';
 	import { PUBLIC_DOMAIN, PUBLIC_WSS_PORT } from '$env/static/public';
 	import deckconfig from '/src/deckconfig.toml';
-	import BgCanvas from '$lib/components/BgCanvas.svelte';
+	// import BgCanvas from '$lib/components/BgCanvas.svelte';
 
 	// 起動ロックの参照を作成
-	let wakeLock: WakeLockSentinel | null = null;
-	let wakeLockStatus = false;
-	let volume = 0.1;
-	const isTotalmixfx = deckconfig.volume.mode === 'totalmixfx';
+	let つけっぱ: WakeLockSentinel | null = null;
+	let つけっぱ状態 = false;
+	let 音量 = 0.1;
+
+	// 状態管理
+	let 音量調整モードDropDown有効 = false;
+	let 音量調整モード: string = deckconfig.volume.mode_options[0];
+	$: isTotalMixFX = 音量調整モード === 'totalmixfx';
 
 	onMount(() => {
-		if (isTotalmixfx) initVolumeWebSocket();
+		音量WebSocket初期化();
 		console.log(deckconfig);
 	});
 
 	//---------------------------------------------
 	// screen wake lock をリクエストするための関数
 	//---------------------------------------------
-	async function toggleWakeLock() {
-		if (!wakeLock) {
+	async function つけっぱ切り替え() {
+		if (!つけっぱ) {
 			// ブラウザは Screen Wake Lock を拒否することがあるので、
 			// try...catch を使い拒否された場合の処理も記述する
 			try {
 				// screen wake lock をリクエストする
-				wakeLock = await navigator.wakeLock.request('screen');
-				wakeLockStatus = true;
-				wakeLock.addEventListener('release', () => {
-					wakeLockStatus = false;
+				つけっぱ = await navigator.wakeLock.request('screen');
+				つけっぱ状態 = true;
+				つけっぱ.addEventListener('release', () => {
+					つけっぱ状態 = false;
 				});
 			} catch (err) {
 				if (err instanceof Error) {
@@ -36,9 +40,22 @@
 				}
 			}
 		} else {
-			wakeLock?.release();
-			wakeLock = null;
+			つけっぱ?.release();
+			つけっぱ = null;
 		}
+	}
+
+	async function post(url: string, data: any): Promise<any> {
+		const res = await fetch(url, {
+			method: 'POST',
+			body: JSON.stringify(data),
+		});
+		if (!res.ok) {
+			const json = await res.json();
+			alert(JSON.stringify(json));
+			throw new Error('Network response was not ok.');
+		}
+		return res.json();
 	}
 
 	async function apiRequest(key: string, method = 'POST'): Promise<any> {
@@ -51,12 +68,18 @@
 		return res.json();
 	}
 
-	async function changeVolume(e: Event) {
-		const volumeStr = (e.target as HTMLInputElement).value;
-		const volume = parseFloat(volumeStr);
-		const res = await fetch(`/api/media/volume`, {
+	async function 音量変更(e: Event) {
+		const volstr = (e.target as HTMLInputElement).value;
+		const vol = parseFloat(volstr);
+		let api;
+		if (isTotalMixFX) {
+			api = 'api/media/totalmixfx/volume';
+		} else {
+			api = 'api/media/volume';
+		}
+		const res = await fetch(api, {
 			method: 'POST',
-			body: JSON.stringify({ volume, mode: deckconfig.volume.mode })
+			body: JSON.stringify({ volume: vol })
 		});
 		if (!res.ok) {
 			const json = await res.json();
@@ -65,15 +88,16 @@
 		}
 	}
 
-	async function initVolumeWebSocket() {
-		const volumeSocket = new WebSocket(`wss://${PUBLIC_DOMAIN}:${PUBLIC_WSS_PORT}`);
-		volumeSocket.addEventListener('message', (event) => {
-			const data = JSON.parse(event.data);
+	async function 音量WebSocket初期化() {
+		const sock = new WebSocket(`wss://${PUBLIC_DOMAIN}:${PUBLIC_WSS_PORT}`);
+		sock.addEventListener('message', (e) => {
+			const data = JSON.parse(e.data);
 			if (data.msg && data.msg === '/1/mastervolume') {
-				const receivedVol = data.arg;
-				if (!receivedVol) return;
-				if (typeof receivedVol !== 'number') return;
-				volume = receivedVol;
+				if (!isTotalMixFX) return;
+				const vol = data.arg;
+				if (!vol) return;
+				if (typeof vol !== 'number') return;
+				音量 = vol;
 			}
 		});
 	}
@@ -81,52 +105,96 @@
 
 <main class="container">
 	<section class="section">
-		<h1 class="title">Wake Lock Section</h1>
-		<button class="box button is-light is-fullwidth" on:click={toggleWakeLock}>
-			Toggle Wake Lock
+		<h1 class="title">常時起動設定 🌞</h1>
+		<button class="box button is-light is-fullwidth" on:click={つけっぱ切り替え}>
+			常時起動を切り替え
 		</button>
 		<div class="box">
-			Wake Lock Status: {wakeLockStatus ? '😎 enabled' : '😪 disabled'}
+			常時起動モード: {つけっぱ状態 ? '😎 有効' : '😪 無効'}
 		</div>
 	</section>
 	<section class="section">
-		<h1 class="title">Media Section</h1>
+		<h1 class="title">メディア操作 🎵</h1>
 		<div class="buttons has-addons is-centered">
 			<button class="button is-large" on:click={() => apiRequest('media/prev-track')}> ⏮️ </button>
 			<button class="button is-large" on:click={() => apiRequest('media/play-pause')}> ⏯️ </button>
 			<button class="button is-large" on:click={() => apiRequest('media/next-track')}> ⏭️ </button>
 			<button class="button is-large" on:click={() => apiRequest('media/mute')}> 🔇 </button>
 		</div>
+		<div class="dropdown" class:is-active={音量調整モードDropDown有効} on:click={() => 音量調整モードDropDown有効 = !音量調整モードDropDown有効}>
+			<div class="dropdown-trigger">
+				<button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+					<span>音量調整モード: {音量調整モード}</span>
+					<span class="icon is-small">
+						<i class="fas fa-angle-down" aria-hidden="true"></i>
+					</span>
+				</button>
+			</div>
+			<div class="dropdown-menu" id="dropdown-menu" role="menu">
+				<div class="dropdown-content">
+					{#each deckconfig.volume.mode_options as mode}
+						<div class="dropdown-item" role="menuitem" on:click={() => 音量調整モード = mode}>
+							{mode}
+						</div>
+					{/each}
+				</div>
+			</div>
+		</div>
 		<input
 			class="slider is-fullwidth is-circle"
 			step="0.005"
 			min="0"
 			max="1"
-			value={volume}
+			value={音量}
 			type="range"
-			on:input={changeVolume}
+			on:input={音量変更}
 		/>
 	</section>
 	<section class="section">
-		<h1 class="title">Desktop Section</h1>
+		<h1 class="title">デスクトップ 🖥️</h1>
 		<div class="buttons has-addons is-centered">
-			{#each deckconfig.desktop.switch as target }
-				<button class="button is-large" on:click={() => apiRequest(`desktop/switch/${target.name}`)}> {target.body} </button>
+			{#each deckconfig.desktop.switch as target}
+				<button
+					class="button is-large"
+					on:click={() => apiRequest(`desktop/switch/${target.name}`)}
+				>
+					{target.body}
+				</button>
 			{/each}
 		</div>
 		<div class="buttons is-centered">
-			<button class="button" on:click={() => apiRequest('desktop/pin-active')}> 📌 Pin Active </button>
-			<button class="button" on:click={() => apiRequest('desktop/unpin-active')}> ✂️ Unpin Active </button>
+			<button class="button" on:click={() => apiRequest('desktop/pin-active')}>
+				📌 Pin Active
+			</button>
+			<button class="button" on:click={() => apiRequest('desktop/unpin-active')}>
+				✂️ Unpin Active
+			</button>
 		</div>
 	</section>
 	<section class="section">
-		<h1 class="title">App Section</h1>
+		<h1 class="title">アプリ📱</h1>
 		<div class="buttons has-addons is-centered">
-			{#each deckconfig.app as target }
-				<button class="button is-large" on:click={() => apiRequest(`app/${target.mode}/${target.name}`)}> {target.body} </button>
+			{#each deckconfig.app as target}
+				<button
+					class="button is-large"
+					on:click={() => apiRequest(`app/${target.mode}/${target.name}`)}
+				>
+					{target.body}
+				</button>
 			{/each}
+		</div>
+	</section>
+
+	<section class="section">
+		<h1 class="title">システム🛠️</h1>
+		<div class="buttons has-addons is-centered">
+			<button class="button is-large" on:click={() => apiRequest('system/sleep')}> ぽやしみ～😴 </button>
+			<button class="button is-large" on:click={() => apiRequest('system/shutdown')}> シャットダウン🌉 </button>
+			<button class="button is-large" on:click={() => apiRequest('system/restart')}> 再起動🌄 </button>
+		</div>
 	</section>
 </main>
+
 <!-- <BgCanvas /> -->
 
 <style lang="scss">

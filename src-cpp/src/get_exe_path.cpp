@@ -1,11 +1,35 @@
-﻿#include "../include/get_exe_path.h"
-#include "Windows.h"
-#include <iostream>
+﻿#include "Windows.h"
 #include <psapi.h>
 #include <stdlib.h>
+#include <iostream>
 
 #define TRUE 1
 #define FALSE 0
+
+int get_exe_path(const unsigned long long window_handle, char** path);
+
+int main(int argc, char** argv)
+{
+    if (argc != 2)
+    {
+        std::cerr << "Usage: " << argv[0] << " <window_handle>" << std::endl;
+        return 1;
+    }
+
+    uintptr_t window_handle = 0;
+    window_handle = atoi(argv[1]);
+
+    char* path = nullptr;
+    if (!get_exe_path(window_handle, &path))
+    {
+        std::cerr << "Error" << std::endl;
+        return 1;
+    }
+    std::wcout << "Path: " << path << std::endl;
+
+    delete[] path;
+    return 0;
+}
 
 #undef MAX_PATH
 #define MAX_PATH 1024
@@ -64,11 +88,6 @@ int get_exe_path(const unsigned long long window_handle, char** path)
     CloseHandle(hProc);
 
     return TRUE;
-}
-
-void free_path(char* path)
-{
-    delete[] path;
 }
 
 char* wcharToChar(const wchar_t* wstr) {

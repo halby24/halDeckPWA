@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ params }) =>
 
 async function getExecutableNameFromHandle(handle: number): Promise<string | null>
 {
-    const { stdout } = await exec(`bin\\get_exe_path.exe ${handle}`)
+    const { stdout } = await exec(`bin\\halDeck_GetExePath.exe ${handle}`)
         .catch(({ stdout, stderr }) => { console.error(stderr); return { stdout }; });
     const exePath = stdout.replace(/[\r\n]/g, '');
     if (exePath === '')

@@ -14,7 +14,10 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test:integration": "playwright test",
-		"test:unit": "vitest"
+		"test:unit": "vitest",
+		"start": "npm run dev",
+		"install-service": "npx winser -i -a",
+		"uninstall-service": "npx winser -r -x"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.28.1",
