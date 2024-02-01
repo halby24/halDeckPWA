@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { exec as execCb } from 'child_process';
 import { promisify } from 'util';
 import activeWindow from 'active-win';
+import { VIRTUALDESKTOP_EXE } from '$env/static/private';
 
 const exec = promisify(execCb);
 
@@ -16,7 +17,7 @@ export const POST: RequestHandler = async () =>
     if (!id)
         return error(500, 'Active window id not found');
 
-    await exec(`bin\\VirtualDesktop11-23H2.exe /PinWindowHandle:${id}`);
+    await exec(`bin\\${VIRTUALDESKTOP_EXE} /PinWindowHandle:${id}`);
 
     return new Response();
 };

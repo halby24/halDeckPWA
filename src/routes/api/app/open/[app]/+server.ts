@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { exec as execCb } from 'child_process';
+import { VIRTUALDESKTOP_EXE } from '$env/static/private';
 
 const execAllSuccess = (cmd: string) => new Promise<{ stdout: string, stderr: string }>((resolve) => execCb(cmd, (err, stdout, stderr) => resolve({ stdout, stderr })));
 const exec = (cmd: string) => new Promise<{ stdout: string, stderr: string }>((resolve, reject) => execCb(cmd, (err, stdout, stderr) => err ? reject({ stdout, stderr }) : resolve({ stdout, stderr })));
@@ -11,14 +12,14 @@ export const POST: RequestHandler = async ({ params }) =>
 
     let count = 0;
     {
-        const { stdout } = await execAllSuccess('bin\\VirtualDesktop11-23H2.exe /Count');
+        const { stdout } = await execAllSuccess`'bin\\${VIRTUALDESKTOP_EXE} /Count`);
         count = parseInt(stdout.replace(/[^0-9]/g, ''));
     }
     if (count === 0)
         return error(500, 'Virtual desktop not found');
 
     const handles = (await Promise.allSettled(Array.from(Array(count).keys())
-        .map((i) => execAllSuccess(`bin\\VirtualDesktop11-23H2.exe /ListWindowsOnDesktop:${i}`))))
+        .map((i) => execAllSuccess(`bin\\${VIRTUALDESKTOP_EXE} /ListWindowsOnDesktop:${i}`))))
         .filter((res) => res.status === 'fulfilled')
         .map((res) => (res as PromiseFulfilledResult<{ stdout: string, stderr: string }>).value) // 成功したやつだけ取り出す
         .map(({ stdout }, index) => stdout.split('\r\n')
@@ -39,7 +40,7 @@ export const POST: RequestHandler = async ({ params }) =>
         console.log('exeName: ' + exeName);
         if (exeName === `${app}.exe`)
         {
-            await execAllSuccess(`bin\\VirtualDesktop11-23H2.exe /Switch:${index}`);
+            await execAllSuccess(`bin\\${VIRTUALDESKTOP_EXE} /Switch:${index}`);
             return new Response();
         }
     }
