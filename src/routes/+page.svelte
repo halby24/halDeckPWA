@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	import { PUBLIC_DOMAIN, PUBLIC_WSS_PORT } from '$env/static/public';
 	import deckconfig from '/src/deckconfig.toml';
 	// import BgCanvas from '$lib/components/BgCanvas.svelte';
@@ -11,10 +12,12 @@
 
 	// 状態管理
 	let 音量調整モードDropDown有効 = false;
-	let 音量調整モード: string = deckconfig.volume.mode_options[0];
+	let 音量調整モード: string;
 	$: isTotalMixFX = 音量調整モード === 'totalmixfx';
+	$: if (browser) localStorage.setItem('volume_mode', 音量調整モード);
 
 	onMount(() => {
+		音量調整モード = localStorage.getItem('volume_mode') ?? deckconfig.volume.mode_options[0];
 		音量WebSocket初期化();
 		console.log(deckconfig);
 	});
@@ -188,9 +191,11 @@
 	<section class="section">
 		<h1 class="title">システム🛠️</h1>
 		<div class="buttons has-addons is-centered">
-			<button class="button is-large" on:click={() => apiRequest('system/sleep')}> ぽやしみ～😴 </button>
-			<button class="button is-large" on:click={() => apiRequest('system/shutdown')}> シャットダウン🌉 </button>
-			<button class="button is-large" on:click={() => apiRequest('system/restart')}> 再起動🌄 </button>
+			<button class="button is-large" on:click={() => apiRequest('system/standby')}> ぽやしみ～😴 </button>
+			<button class="button is-large" on:click={() => apiRequest('system/exitwin/poweroff')}> シャットダウン🌉 </button>
+			<button class="button is-large" on:click={() => apiRequest('system/exitwin/reboot')}> 再起動🌄 </button>
+			<button class="button is-large" on:click={() => apiRequest('system/monitor/on')}> 画面ON🙂 </button>
+			<button class="button is-large" on:click={() => apiRequest('system/monitor/off')}> 画面OFF😌 </button>
 		</div>
 	</section>
 </main>
