@@ -16,7 +16,7 @@ export const POST: RequestHandler = async () =>
     if (!id)
         return error(500, 'Active window id not found');
 
-    await exec(`bin\\VirtualDesktop11-23H2.exe /PinWindowHandle:${id}`);
+    await exec(`bin\\${VD_EXE} /PinWindowHandle:${id}`);
 
     return new Response();
 };
