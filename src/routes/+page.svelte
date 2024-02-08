@@ -3,7 +3,6 @@
 	import { browser } from '$app/environment';
 	import { PUBLIC_DOMAIN, PUBLIC_WSS_PORT } from '$env/static/public';
 	import deckconfig from '/src/deckconfig.toml';
-	// import BgCanvas from '$lib/components/BgCanvas.svelte';
 
 	// 起動ロックの参照を作成
 	let つけっぱ: WakeLockSentinel | null = null;
@@ -11,10 +10,8 @@
 	let 音量 = 0.1;
 
 	// 状態管理
-	let 音量調整モードDropDown有効 = false;
 	let 音量調整モード: string;
 	$: isTotalMixFX = 音量調整モード === 'totalmixfx';
-	$: if (browser) localStorage.setItem('volume_mode', 音量調整モード);
 
 	onMount(() => {
 		音量調整モード = localStorage.getItem('volume_mode') ?? deckconfig.volume.mode_options[0];
@@ -51,7 +48,7 @@
 	async function post(url: string, data: any): Promise<any> {
 		const res = await fetch(url, {
 			method: 'POST',
-			body: JSON.stringify(data),
+			body: JSON.stringify(data)
 		});
 		if (!res.ok) {
 			const json = await res.json();
@@ -104,6 +101,13 @@
 			}
 		});
 	}
+
+	function 音量モード変更(e: Event) {
+		const mode = (e.target as HTMLOptionElement).value;
+		console.log(mode);
+		localStorage.setItem('volume_mode', mode);
+		音量調整モード = mode;
+	}
 </script>
 
 <main class="container">
@@ -124,24 +128,14 @@
 			<button class="button is-large" on:click={() => apiRequest('media/next-track')}> ⏭️ </button>
 			<button class="button is-large" on:click={() => apiRequest('media/mute')}> 🔇 </button>
 		</div>
-		<div class="dropdown" class:is-active={音量調整モードDropDown有効} on:click={() => 音量調整モードDropDown有効 = !音量調整モードDropDown有効}>
-			<div class="dropdown-trigger">
-				<button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-					<span>音量調整モード: {音量調整モード}</span>
-					<span class="icon is-small">
-						<i class="fas fa-angle-down" aria-hidden="true"></i>
-					</span>
-				</button>
-			</div>
-			<div class="dropdown-menu" id="dropdown-menu" role="menu">
-				<div class="dropdown-content">
-					{#each deckconfig.volume.mode_options as mode}
-						<div class="dropdown-item" role="menuitem" on:click={() => 音量調整モード = mode}>
-							{mode}
-						</div>
-					{/each}
-				</div>
-			</div>
+		<div class="select">
+			<select on:change={音量モード変更}>
+				{#each deckconfig.volume.mode_options as mode}
+					<option value={mode}>
+						{mode}
+					</option>
+				{/each}
+			</select>
 		</div>
 		<input
 			class="slider is-fullwidth is-circle"
@@ -191,11 +185,21 @@
 	<section class="section">
 		<h1 class="title">システム🛠️</h1>
 		<div class="buttons has-addons is-centered">
-			<button class="button is-large" on:click={() => apiRequest('system/standby')}> ぽやしみ～😴 </button>
-			<button class="button is-large" on:click={() => apiRequest('system/exitwin/poweroff')}> シャットダウン🌉 </button>
-			<button class="button is-large" on:click={() => apiRequest('system/exitwin/reboot')}> 再起動🌄 </button>
-			<button class="button is-large" on:click={() => apiRequest('system/monitor/on')}> 画面ON🙂 </button>
-			<button class="button is-large" on:click={() => apiRequest('system/monitor/off')}> 画面OFF😌 </button>
+			<button class="button is-large" on:click={() => apiRequest('system/standby')}>
+				ぽやしみ～😴
+			</button>
+			<button class="button is-large" on:click={() => apiRequest('system/exitwin/poweroff')}>
+				シャットダウン🌉
+			</button>
+			<button class="button is-large" on:click={() => apiRequest('system/exitwin/reboot')}>
+				再起動🌄
+			</button>
+			<button class="button is-large" on:click={() => apiRequest('system/monitor/on')}>
+				画面ON🙂
+			</button>
+			<button class="button is-large" on:click={() => apiRequest('system/monitor/off')}>
+				画面OFF😌
+			</button>
 		</div>
 	</section>
 </main>
