@@ -1,38 +1,12 @@
-﻿#include "Windows.h"
+﻿#include "../include/cpplib.h"
+#include "Windows.h"
+#include <MMDeviceAPI.h>
+#include <endpointvolume.h>
 #include <psapi.h>
-#include <stdlib.h>
 #include <iostream>
+#include <powrprof.h>
 
-#define TRUE 1
-#define FALSE 0
-
-int get_exe_path(const unsigned long long window_handle, char** path);
-
-int main(int argc, char** argv)
-{
-    if (argc != 2)
-    {
-        std::cerr << "Usage: " << argv[0] << " <window_handle>" << std::endl;
-        return 1;
-    }
-
-    uintptr_t window_handle = 0;
-    window_handle = atoi(argv[1]);
-
-    char* path = nullptr;
-    if (!get_exe_path(window_handle, &path))
-    {
-        std::cerr << "Error" << std::endl;
-        return 1;
-    }
-    std::wcout << "Path: " << path << std::endl;
-
-    delete[] path;
-    return 0;
-}
-
-#undef MAX_PATH
-#define MAX_PATH 1024
+#pragma comment(lib, "ole32.lib")
 
 char* wcharToChar(const wchar_t* wstr);
 
@@ -113,4 +87,47 @@ char* wcharToChar(const wchar_t* wstr) {
     }
 
     return converted; // 変換された文字列へのポインタを返す
+}
+
+void set_volume(const float volume_level)
+{
+    CoInitialize(NULL);
+
+    IMMDeviceEnumerator* deviceEnumerator = NULL;
+    IMMDevice* defaultDevice = NULL;
+
+    CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID*)&deviceEnumerator);
+
+    deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &defaultDevice);
+
+    IAudioEndpointVolume* endpointVolume = NULL;
+
+    defaultDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID*)&endpointVolume);
+
+    endpointVolume->SetMasterVolumeLevelScalar(volume_level, NULL);
+
+    endpointVolume->Release();
+    defaultDevice->Release();
+    deviceEnumerator->Release();
+    CoUninitialize();
+}
+
+void system_shutdown()
+{
+    ExitWindowsEx(EWX_POWEROFF, SHTDN_REASON_MAJOR_OTHER);
+}
+
+void system_sleep()
+{
+    SetSuspendState(FALSE, FALSE, FALSE);
+}
+
+void delete_ptr(void* ptr)
+{
+    delete ptr;
+}
+
+void delete_array_ptr(void* ptr)
+{
+    delete[] ptr;
 }

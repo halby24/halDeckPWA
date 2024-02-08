@@ -52,8 +52,10 @@
 	"type": "module",
 	"dependencies": {
 		"active-win": "^8.1.1",
+		"bindings": "^1.5.0",
 		"ffi-napi": "^4.0.3",
 		"iconv-lite": "^0.6.3",
+		"node-addon-api": "^7.1.0",
 		"node-osc": "^9.1.0",
 		"ref-napi": "^3.0.3",
 		"regedit": "^5.1.2",
