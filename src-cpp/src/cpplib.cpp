@@ -1,5 +1,5 @@
 ﻿#include "../include/cpplib.h"
-#include "Windows.h"
+#include <Windows.h>
 #include <MMDeviceAPI.h>
 #include <endpointvolume.h>
 #include <psapi.h>
@@ -7,6 +7,10 @@
 #include <powrprof.h>
 
 #pragma comment(lib, "ole32.lib")
+#pragma comment(lib, "powrprof.lib")
+
+#define TRUE 1
+#define FALSE 0
 
 char* wcharToChar(const wchar_t* wstr);
 
@@ -117,17 +121,32 @@ void system_shutdown()
     ExitWindowsEx(EWX_POWEROFF, SHTDN_REASON_MAJOR_OTHER);
 }
 
+void system_restart()
+{
+    ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_OTHER);
+}
+
 void system_sleep()
 {
     SetSuspendState(FALSE, FALSE, FALSE);
 }
 
+void display_on()
+{
+    SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, -1);
+}
+
+void display_off()
+{
+    SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, 2);
+}
+
 void delete_ptr(void* ptr)
 {
-    delete ptr;
+    if (ptr) delete ptr;
 }
 
 void delete_array_ptr(void* ptr)
 {
-    delete[] ptr;
+    if (ptr) delete[] ptr;
 }

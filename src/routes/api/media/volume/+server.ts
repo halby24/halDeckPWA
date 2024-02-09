@@ -1,7 +1,13 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import * as ffi from 'ffi-napi';
 import { exec as execCb } from 'child_process';
 const exec = (cmd: string) => new Promise<{ stdout: string, stderr: string }>((resolve, reject) => execCb(cmd, (err, stdout, stderr) => err ? reject({ stdout, stderr }) : resolve({ stdout, stderr })));
+
+const dll = 'bin/cpplib.dll';
+const lib = ffi.Library(dll, {
+    'set_volume': ['void', ['float']]
+});
 
 export const POST: RequestHandler = async ({ request }) =>
 {
@@ -25,8 +31,9 @@ export const POST: RequestHandler = async ({ request }) =>
         throw error(422, 'volume value is not between 0 and 1');
     }
 
-    await exec(`nircmd setsysvolume ${Math.round(volume * 65535)}`)
-        .catch(({ stderr }) => { error(500, stderr) });
+    // await exec(`nircmd setsysvolume ${Math.round(volume * 65535)}`)
+    //     .catch(({ stderr }) => { error(500, stderr) });
+    lib.set_volume(volume);
 
     return new Response();
 };
