@@ -93,7 +93,7 @@ char* wcharToChar(const wchar_t* wstr) {
     return converted; // 変換された文字列へのポインタを返す
 }
 
-void set_volume(const float volume_level)
+int set_volume(const float volume_level)
 {
     CoInitialize(NULL);
 
@@ -108,37 +108,39 @@ void set_volume(const float volume_level)
 
     defaultDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID*)&endpointVolume);
 
-    endpointVolume->SetMasterVolumeLevelScalar(volume_level, NULL);
+    auto result = endpointVolume->SetMasterVolumeLevelScalar(volume_level, NULL);
 
     endpointVolume->Release();
     defaultDevice->Release();
     deviceEnumerator->Release();
     CoUninitialize();
+
+    return result;
 }
 
-void system_shutdown()
+int system_shutdown()
 {
-    ExitWindowsEx(EWX_POWEROFF, SHTDN_REASON_MAJOR_OTHER);
+    return ExitWindowsEx(EWX_POWEROFF, SHTDN_REASON_MAJOR_OTHER);
 }
 
-void system_restart()
+int system_restart()
 {
-    ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_OTHER);
+    return ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_OTHER);
 }
 
-void system_sleep()
+int system_sleep()
 {
-    SetSuspendState(FALSE, FALSE, FALSE);
+    return SetSuspendState(FALSE, FALSE, FALSE);
 }
 
-void display_on()
+int display_on()
 {
-    SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, -1);
+    return SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, -1);
 }
 
-void display_off()
+int display_off()
 {
-    SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, 2);
+    return SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, 2);
 }
 
 void delete_ptr(void* ptr)
