@@ -185,19 +185,19 @@
 	<section class="section">
 		<h1 class="title">システム🛠️</h1>
 		<div class="buttons has-addons is-centered">
-			<button class="button is-large" on:click={() => apiRequest('system/standby')}>
+			<button class="button is-large" on:click={() => apiRequest('system/power/sleep')}>
 				ぽやしみ～😴
 			</button>
-			<button class="button is-large" on:click={() => apiRequest('system/exitwin/poweroff')}>
+			<button class="button is-large" on:click={() => apiRequest('system/power/shutdown')}>
 				シャットダウン🌉
 			</button>
-			<button class="button is-large" on:click={() => apiRequest('system/exitwin/reboot')}>
+			<button class="button is-large" on:click={() => apiRequest('system/power/restart')}>
 				再起動🌄
 			</button>
-			<button class="button is-large" on:click={() => apiRequest('system/monitor/on')}>
+			<button class="button is-large" on:click={() => apiRequest('system/display/on')}>
 				画面ON🙂
 			</button>
-			<button class="button is-large" on:click={() => apiRequest('system/monitor/off')}>
+			<button class="button is-large" on:click={() => apiRequest('system/display/off')}>
 				画面OFF😌
 			</button>
 		</div>
