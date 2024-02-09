@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { exec as execCb } from 'child_process';
 import { promisify } from 'util';
 import activeWindow from 'active-win';
+import { VIRTUALDESKTOP_EXE } from '$env/static/private';
 
 const exec = promisify(execCb);
 
