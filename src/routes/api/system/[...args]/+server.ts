@@ -1,8 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import * as ffi from 'ffi-napi';
-import { exec as execCb } from 'child_process';
-const exec = (cmd: string) => new Promise<{ stdout: string, stderr: string }>((resolve, reject) => execCb(cmd, (err, stdout, stderr) => err ? reject({ stdout, stderr }) : resolve({ stdout, stderr })));
 
 const dll = 'bin/cpplib.dll';
 const lib = ffi.Library(dll, {

@@ -12,8 +12,6 @@
 #define TRUE 1
 #define FALSE 0
 
-char* wcharToChar(const wchar_t* wstr);
-
 int get_exe_path(const unsigned long long window_handle, char* path, size_t path_length)
 {
     setlocale(LC_ALL, "ja_JP.UTF-8");
