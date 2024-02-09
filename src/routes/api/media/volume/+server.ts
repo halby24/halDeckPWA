@@ -6,7 +6,7 @@ const exec = (cmd: string) => new Promise<{ stdout: string, stderr: string }>((r
 
 const dll = 'bin/cpplib.dll';
 const lib = ffi.Library(dll, {
-    'set_volume': ['void', ['float']]
+    'set_volume': ['int', ['float']]
 });
 
 export const POST: RequestHandler = async ({ request }) =>
@@ -31,8 +31,6 @@ export const POST: RequestHandler = async ({ request }) =>
         throw error(422, 'volume value is not between 0 and 1');
     }
 
-    // await exec(`nircmd setsysvolume ${Math.round(volume * 65535)}`)
-    //     .catch(({ stderr }) => { error(500, stderr) });
     lib.set_volume(volume);
 
     return new Response();

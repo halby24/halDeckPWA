@@ -6,19 +6,16 @@ const exec = (cmd: string) => new Promise<{ stdout: string, stderr: string }>((r
 
 const dll = 'bin/cpplib.dll';
 const lib = ffi.Library(dll, {
-    'system_sleep': ['void', []],
-    'system_shutdown': ['void', []],
-    'system_restart': ['void', []],
-    'display_off': ['void', []],
-    'display_on': ['void', []],
+    'system_sleep': ['int', []],
+    'system_shutdown': ['int', []],
+    'system_restart': ['int', []],
+    'display_off': ['int', []],
+    'display_on': ['int', []],
 });
 
 export const POST: RequestHandler = async ({ params }) =>
 {
     const { args } = params;
-    // const argsStr = args.split('/').join(' ');
-    // await exec(`nircmd ${argsStr}`)
-    //     .catch(({ stderr }) => { error(500, stderr) });
 
     switch (args)
     {

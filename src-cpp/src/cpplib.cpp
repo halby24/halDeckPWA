@@ -1,10 +1,10 @@
 ﻿#include "../include/cpplib.h"
-#include <Windows.h>
 #include <MMDeviceAPI.h>
+#include <Windows.h>
 #include <endpointvolume.h>
-#include <psapi.h>
 #include <iostream>
 #include <powrprof.h>
+#include <psapi.h>
 
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "powrprof.lib")
@@ -14,7 +14,7 @@
 
 char* wcharToChar(const wchar_t* wstr);
 
-int get_exe_path(const unsigned long long window_handle, char** path)
+int get_exe_path(const unsigned long long window_handle, char* path, size_t path_length)
 {
     setlocale(LC_ALL, "ja_JP.UTF-8");
 
@@ -41,6 +41,7 @@ int get_exe_path(const unsigned long long window_handle, char** path)
     auto modNum = cbNeeded / sizeof(HMODULE);
 
     auto foundFlag = false;
+    int result = FALSE;
     for (int i = 0; i < modNum; i++)
     {
         wchar_t modName[MAX_PATH];
@@ -53,7 +54,7 @@ int get_exe_path(const unsigned long long window_handle, char** path)
         if (wcsstr(modName, L".exe") == NULL) continue;
         foundFlag = true;
 
-        *path = wcharToChar(modName);
+        result = WideCharToMultiByte(CP_UTF8, 0, modName, -1, path, path_length, NULL, NULL);
 
         break;
     }
@@ -65,32 +66,7 @@ int get_exe_path(const unsigned long long window_handle, char** path)
 
     CloseHandle(hProc);
 
-    return TRUE;
-}
-
-char* wcharToChar(const wchar_t* wstr) {
-    if (wstr == nullptr) {
-        return nullptr; // 引数がnullptrの場合はnullptrを返す
-    }
-
-    // 変換後の文字列のサイズを取得するためにwcstombs_sを最初に呼び出す
-    size_t convertedSize = 0;
-    errno_t err = wcstombs_s(&convertedSize, nullptr, 0, wstr, _TRUNCATE);
-    if (err != 0 || convertedSize == 0) {
-        // サイズの取得に失敗
-        return nullptr;
-    }
-
-    // char配列に変換するためのメモリを動的に確保
-    char* converted = new char[convertedSize];
-    err = wcstombs_s(&convertedSize, converted, convertedSize, wstr, _TRUNCATE);
-    if (err != 0) {
-        // 変換に失敗した場合
-        delete[] converted; // 確保したメモリを解放
-        return nullptr;
-    }
-
-    return converted; // 変換された文字列へのポインタを返す
+    return result;
 }
 
 int set_volume(const float volume_level)
@@ -118,37 +94,12 @@ int set_volume(const float volume_level)
     return result;
 }
 
-int system_shutdown()
-{
-    return ExitWindowsEx(EWX_POWEROFF, SHTDN_REASON_MAJOR_OTHER);
-}
+int system_shutdown() { return ExitWindowsEx(EWX_POWEROFF, SHTDN_REASON_MAJOR_OTHER); }
 
-int system_restart()
-{
-    return ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_OTHER);
-}
+int system_restart() { return ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_OTHER); }
 
-int system_sleep()
-{
-    return SetSuspendState(FALSE, FALSE, FALSE);
-}
+int system_sleep() { return SetSuspendState(FALSE, FALSE, FALSE); }
 
-int display_on()
-{
-    return SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, -1);
-}
+int display_on() { return SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, -1); }
 
-int display_off()
-{
-    return SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, 2);
-}
-
-void delete_ptr(void* ptr)
-{
-    if (ptr) delete ptr;
-}
-
-void delete_array_ptr(void* ptr)
-{
-    if (ptr) delete[] ptr;
-}
+int display_off() { return SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, 2); }
