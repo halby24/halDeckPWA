@@ -5,6 +5,7 @@
 #include <iostream>
 #include <powrprof.h>
 #include <psapi.h>
+#include <vector>
 
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "powrprof.lib")
@@ -101,3 +102,37 @@ int system_sleep() { return SetSuspendState(FALSE, FALSE, FALSE); }
 int display_on() { return SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, -1); }
 
 int display_off() { return SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, 2); }
+
+int send_char_unicode(int utf32)
+{
+    // UTF-32からUTF-16への変換
+    wchar_t unicodeString[2]; // UTF-16サロゲートペアを格納するための配列
+    if (utf32 > 0xFFFF)
+    { // サロゲートペアが必要な場合
+        utf32 -= 0x10000;
+        unicodeString[0] = 0xD800 | ((utf32 >> 10) & 0x3FF); // 上位サロゲート
+        unicodeString[1] = 0xDC00 | (utf32 & 0x3FF);         // 下位サロゲート
+    } else
+    { // サロゲートペアが不要な場合
+        unicodeString[0] = utf32;
+        unicodeString[1] = 0; // 配列の終端
+    }
+
+    // INPUT構造体の配列を準備
+    std::vector<INPUT> inputs;
+    for (int i = 0; unicodeString[i] != 0 && i < 2; ++i)
+    {
+        INPUT input = {};
+        input.type = INPUT_KEYBOARD;
+        input.ki.wVk = 0;
+        input.ki.wScan = unicodeString[i];
+        input.ki.dwFlags = KEYEVENTF_UNICODE;
+        inputs.push_back(input); // キー押下イベント
+
+        input.ki.dwFlags |= KEYEVENTF_KEYUP;
+        inputs.push_back(input); // キー解放イベント
+    }
+
+    // イベントの送信
+    return SendInput(static_cast<UINT>(inputs.size()), &inputs[0], sizeof(INPUT));
+}

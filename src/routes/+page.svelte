@@ -58,8 +58,8 @@
 		return res.json();
 	}
 
-	async function apiRequest(key: string, method = 'POST'): Promise<any> {
-		const res = await fetch(`/api/${key}`, { method });
+	async function apiRequest(key: string, method = 'POST', body = {}): Promise<any> {
+		const res = await fetch(`/api/${key}`, { method, body: JSON.stringify(body)});
 		if (!res.ok) {
 			const json = await res.json();
 			alert(JSON.stringify(json));
@@ -120,6 +120,7 @@
 			常時起動モード: {つけっぱ状態 ? '😎 有効' : '😪 無効'}
 		</div>
 	</section>
+
 	<section class="section">
 		<h1 class="title">メディア操作 🎵</h1>
 		<div class="buttons has-addons is-centered">
@@ -147,6 +148,21 @@
 			on:input={音量変更}
 		/>
 	</section>
+
+	<section class="section">
+		<h1 class="title">絵文字 😊</h1>
+		<div class="buttons has-addons is-centered">
+			{#each deckconfig.emoji as emoji}
+				<button
+					class="button is-large"
+					on:click={() => apiRequest('emoji', 'POST', { emoji: emoji})}
+				>
+					{emoji}
+				</button>
+			{/each}
+		</div>
+	</section>
+
 	<section class="section">
 		<h1 class="title">デスクトップ 🖥️</h1>
 		<div class="buttons has-addons is-centered">
@@ -168,8 +184,9 @@
 			</button>
 		</div>
 	</section>
+
 	<section class="section">
-		<h1 class="title">アプリ📱</h1>
+		<h1 class="title">アプリ 📱</h1>
 		<div class="buttons has-addons is-centered">
 			{#each deckconfig.app as target}
 				<button
