@@ -11,12 +11,13 @@
 
 	// 状態管理
 	let 音量調整モード: string;
+	let 音量調整モードセレクタ: HTMLSelectElement;
 	$: isTotalMixFX = 音量調整モード === 'totalmixfx';
 
 	onMount(() => {
 		音量調整モード = localStorage.getItem('volume_mode') ?? deckconfig.volume.mode_options[0];
+		音量調整モードセレクタ.value = 音量調整モード;
 		音量WebSocket初期化();
-		console.log(deckconfig);
 	});
 
 	//---------------------------------------------
@@ -130,7 +131,7 @@
 			<button class="button is-large" on:click={() => apiRequest('media/mute')}> 🔇 </button>
 		</div>
 		<div class="select">
-			<select on:change={音量モード変更}>
+			<select on:change={音量モード変更} bind:this={音量調整モードセレクタ}>
 				{#each deckconfig.volume.mode_options as mode}
 					<option value={mode}>
 						{mode}
