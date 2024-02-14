@@ -221,8 +221,6 @@
 	</section>
 </main>
 
-<!-- <BgCanvas /> -->
-
 <style lang="scss">
 	main {
 		max-width: 100vw;
