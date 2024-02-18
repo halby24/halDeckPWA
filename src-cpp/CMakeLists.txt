@@ -5,8 +5,6 @@ project(halDeck CXX)
 add_library(cpplib SHARED
     include/cpplib.h
     src/cpplib.cpp
-    include/com.h
-    src/com.cpp
 )
 
 add_custom_command(TARGET cpplib POST_BUILD

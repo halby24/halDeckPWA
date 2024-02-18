@@ -160,34 +160,6 @@ int send_char_unicode(int utf32)
     return SendInput(static_cast<UINT>(inputs.size()), &inputs[0], sizeof(INPUT));
 }
 
-bool desktop_switch()
-{
-    if (!CoInitialize(NULL))
-    {
-        std::cerr << "Failed to initialize COM." << std::endl;
-        return false;
-    }
-
-    IVirtualDesktopManager* manager = nullptr;
-    if (!CoCreateInstance(CLSID_VirtualDesktopManager, NULL, CLSCTX_ALL, IID_PPV_ARGS(&manager)))
-    {
-        std::cerr << "Failed to create instance." << std::endl;
-        return false;
-    }
-
-    GUID desktopId;
-    if (!manager->GetWindowDesktopId(GetForegroundWindow(), &desktopId))
-    {
-        std::cerr << "Failed to get desktop id." << std::endl;
-        return false;
-    }
-
-    manager->Release();
-    CoUninitialize();
-
-    return true;
-}
-
 BOOL EnablePrivileges(LPTSTR lpPrivilegeName, BOOL bEnable)
 {
     HANDLE hToken;
