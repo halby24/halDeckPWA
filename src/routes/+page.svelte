@@ -220,6 +220,17 @@
 			</button>
 		</div>
 	</section>
+
+	<section class="section">
+		<h1 class="title">LightHouse ⛯️</h1>
+		<div class="buttons has-addons is-centered">
+			<button class="button is-large" on:click={() => apiRequest('lighthouse/on')}>
+				ON
+			</button>
+			<button class="button is-large" on:click={() => apiRequest('lighthouse/off')}>
+				OFF
+			</button>
+	</section>
 </main>
 
 <style lang="scss">
