@@ -1,6 +1,5 @@
 PointerAlignment: Left
 IndentWidth: 4
-ColumnLimit: 200
 BinPackArguments: true
 BinPackParameters: true
 AlignAfterOpenBracket: Align
