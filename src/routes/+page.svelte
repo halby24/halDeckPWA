@@ -146,6 +146,7 @@
 			max="1"
 			value={音量}
 			type="range"
+			unselectable="on"
 			on:input={音量変更}
 		/>
 	</section>
