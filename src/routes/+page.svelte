@@ -60,13 +60,24 @@
 	}
 
 	async function apiRequest(key: string, method = 'POST', body = {}): Promise<any> {
-		const res = await fetch(`/api/${key}`, { method, body: JSON.stringify(body)});
+		const data: RequestInit = {};
+		data.method = method;
+		if (method === 'POST') {
+			data.body = JSON.stringify(body);
+			console.log(data.body);
+		}
+		const res = await fetch(`/api/${key}`, data);
 		if (!res.ok) {
 			const json = await res.json();
 			alert(JSON.stringify(json));
 			throw new Error('Network response was not ok.');
 		}
-		return res.json();
+		const ctype = res.headers.get('content-type');
+		if (ctype && ctype.includes('application/json')) {
+			return res.json();
+		} else {
+			return res.text();
+		}
 	}
 
 	async function 音量変更(e: Event) {
@@ -108,6 +119,18 @@
 		console.log(mode);
 		localStorage.setItem('volume_mode', mode);
 		音量調整モード = mode;
+	}
+
+	async function クリップボード送信() {
+		const text = await navigator.clipboard.readText();
+		console.log(text);
+		await apiRequest('clipboard/send', 'POST', { text });
+	}
+
+	async function クリップボード受信() {
+		const res = await apiRequest('clipboard/receive', 'GET');
+		console.log(res.text);
+		await navigator.clipboard.writeText(res.text);
 	}
 </script>
 
@@ -156,11 +179,19 @@
 			{#each deckconfig.emoji as emoji}
 				<button
 					class="button is-large"
-					on:click={() => apiRequest('emoji', 'POST', { emoji: emoji})}
+					on:click={() => apiRequest('emoji', 'POST', { emoji: emoji })}
 				>
 					{emoji}
 				</button>
 			{/each}
+		</div>
+	</section>
+
+	<section class="section">
+		<h1 class="title">Clipboard 📝</h1>
+		<div class="buttons has-addons is-centered">
+			<button class="button is-large" on:click={クリップボード送信}> 送信 ✉️ </button>
+			<button class="button is-large" on:click={クリップボード受信}> 受信 📩 </button>
 		</div>
 	</section>
 
@@ -224,12 +255,9 @@
 	<section class="section">
 		<h1 class="title">LightHouse ⛯️</h1>
 		<div class="buttons has-addons is-centered">
-			<button class="button is-large" on:click={() => apiRequest('lighthouse/on')}>
-				ON
-			</button>
-			<button class="button is-large" on:click={() => apiRequest('lighthouse/off')}>
-				OFF
-			</button>
+			<button class="button is-large" on:click={() => apiRequest('lighthouse/on')}> ON </button>
+			<button class="button is-large" on:click={() => apiRequest('lighthouse/off')}> OFF </button>
+		</div>
 	</section>
 </main>
 
